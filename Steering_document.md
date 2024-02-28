@@ -15,7 +15,7 @@
 ## Roles & Responsibilities
 
 - **Project Manager:** Martin
-  - **Expectations:** As the project manager, I expect myself to ...
+  - **Expectations:** Keep the team on track with the goals of the project, help and guide where there is a need, motivate, help structure the work.
   - **What do we expect of each other?:** We expect open communication, collaboration, and accountability from each team member.
   - **What do we expect of the project?:** We expect the project to be completed within the designated timeline and meet all specified requirements.
 
