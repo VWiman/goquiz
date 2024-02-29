@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 
 export default function adminpage() {
+	// State to store questions fetched from the backend
 	const [stateQuestions, setStateQuestions] = useState({ questions: [] });
+	// State to store the current question being created
 	const [question, setQuestion] = useState("");
+	// State to store the answer to the current question
 	const [answer, setAnswer] = useState("");
+	// States for each of the wrong choices
 	const [choiceTwo, setChoiceTwo] = useState("");
 	const [choiceThree, setChoiceThree] = useState("");
 	const [choiceFour, setChoiceFour] = useState("");
+	// State to indicate if a question is currently being sent to the backend
 	const [isSending, setIsSending] = useState(false);
 
+	// Function to fetch questions from the backend
 	const fetchQuestions = async () => {
 		const response = await fetch("/api/store");
 		const data = await response.json();
@@ -16,9 +22,10 @@ export default function adminpage() {
 		setStateQuestions(data);
 	};
 
+	// Function to update the list of questions, including the current question being created
 	const updateQuestions = async () => {
 		const orderedChoices = [answer, choiceTwo, choiceThree, choiceFour];
-		// shuffle fick jag leta upp
+		// Shuffles the array of choices to randomize their order
 		function shuffle(array) {
 			for (let index = array.length - 1; index > 0; index--) {
 				const randomIndex = Math.floor(Math.random() * (index + 1));
@@ -43,12 +50,14 @@ export default function adminpage() {
 		fetchQuestions();
 	};
 
+	// Handles form submission, validates the question, and triggers question update
 	function handleForm(e) {
 		if (question != "") {
 			setIsSending(true);
 			e.preventDefault();
 			console.log(e.target.value);
 			updateQuestions();
+			// Resets the form fields after submission
 			setQuestion("");
 			setAnswer("");
 			setChoiceTwo("");
@@ -57,12 +66,14 @@ export default function adminpage() {
 		} else alert("You need to fill in the question form.");
 	}
 
+	// Fetches the list of questions when the component mounts
 	useEffect(() => {
 		fetchQuestions();
 	}, []);
 
 	return (
 		<main>
+			// The form for creating a new question
 			<form onSubmit={(e) => handleForm(e)}>
 				<label htmlFor="question">
 					Question:
@@ -104,7 +115,7 @@ export default function adminpage() {
 					Add question
 				</button>
 			</form>
-
+			// Displays the list of questions with their choices
 			<ul>
 				{stateQuestions.questions.map((item, index) => (
 					<li key={index}>
@@ -112,6 +123,7 @@ export default function adminpage() {
 						<ul>
 							{item.choices.map((choice, i) => (
 								<li key={i}>
+									// Highlights the correct answer in blue and wrong answers in red
 									<button className={`${choice == item.answer ? "bg-blue-500" : "bg-red-500"}`}>{choice}</button>
 								</li>
 							))}
