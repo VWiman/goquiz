@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { QuizContext } from "@/context/QuizContext";
 export default function adminpage() {
-	// Get state from context
+	// Get states from context
 	const { stateQuestions, setStateQuestions, newQuestion, setNewQuestion, isSending, setIsSending } =
 		useContext(QuizContext);
 
@@ -141,9 +141,11 @@ export default function adminpage() {
 							})
 						}></input>
 				</label>
+
 				<button disabled={isSending} type="submit" id="submitButton">
 					Add question
 				</button>
+				
 			</form>
 			{/* // Displays the list of questions with their choices */}
 			<ul>
