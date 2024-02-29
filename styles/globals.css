@@ -3,25 +3,21 @@
 @tailwind utilities;
 
 label {
-  @apply flex flex-row gap-2 items-center
+  @apply flex flex-row gap-2 items-center;
 }
 
 input {
-  @apply border border-black p-1
+  @apply border border-black p-1;
 }
 
 button {
-  @apply flex max-w-fit border border-black p-1
+  @apply flex max-w-fit border border-black p-1;
 }
 
 form {
-  @apply flex flex-col gap-2 p-2 justify-center items-center
+  @apply flex flex-col gap-2 p-2 justify-center items-center;
 }
 
 ul {
-  @apply flex flex-col justify-center items-center gap-1
-}
-
-h2 {
-  @apply text-xl font-medium
+  @apply flex flex-col justify-center items-center gap-1;
 }
