@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 
 export default function Home() {
   return (
     <main>
-      <Link to="/adminpage">
+      <Link href="/adminpage">
         <button>Admin</button>
       </Link>
-      <Link to="/userpage">
+      <Link href="/userpage">
         <button>User</button>
       </Link>
     </main>

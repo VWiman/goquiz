@@ -1,0 +1,24 @@
+{
+    "questions": [
+        {
+            "question": "Vilken är huvudstaden i Frankrike?",
+            "choices": [
+                "Paris",
+                "Berlin",
+                "London",
+                "Chicago"
+            ],
+            "answer": "Paris"
+        },
+        {
+            "question": "Hur gammal är Viktor?",
+            "choices": [
+                "36",
+                "26",
+                "40",
+                "33"
+            ],
+            "answer": "36"
+        }
+    ]
+}
