@@ -1,7 +1,9 @@
 import { useContext, useEffect } from "react";
 import { QuizContext } from "@/context/QuizContext";
 export default function adminpage() {
-  const {
+  
+	// Get state from context
+	const {
     stateQuestions,
     setStateQuestions,
     question,
@@ -83,7 +85,7 @@ export default function adminpage() {
 
   return (
     <main>
-      // The form for creating a new question
+      {/* // The form for creating a new question */}
       <form onSubmit={(e) => handleForm(e)}>
         <label htmlFor="question">
           Question:
@@ -138,7 +140,7 @@ export default function adminpage() {
           Add question
         </button>
       </form>
-      // Displays the list of questions with their choices
+      {/* // Displays the list of questions with their choices */}
       <ul>
         {stateQuestions.questions.map((item, index) => (
           <li key={index}>
@@ -146,8 +148,8 @@ export default function adminpage() {
             <ul>
               {item.choices.map((choice, i) => (
                 <li key={i}>
-                  // Highlights the correct answer in blue and wrong answers in
-                  red
+                  {/* Highlights the correct answer in blue and wrong answers in
+                  red */}
                   <button
                     className={`${
                       choice == item.answer ? "bg-blue-500" : "bg-red-500"
