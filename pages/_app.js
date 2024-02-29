@@ -1,5 +1,12 @@
+import { QuizProvider } from "@/context/QuizContext";
 import "@/styles/globals.css";
 
-export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+function MyApp({ Component, pageProps }) {
+  return (
+    <QuizProvider>
+      <Component {...pageProps} />
+    </QuizProvider>
+  );
 }
+
+export default MyApp;
