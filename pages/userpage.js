@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "@/context/QuizContext";
+
 export default function userpage() {
   // Get states from context
   const { stateQuestions, setStateQuestions } = useContext(QuizContext);
@@ -21,7 +22,21 @@ export default function userpage() {
   const fetchQuestions = async () => {
     const response = await fetch("/api/store");
     const data = await response.json();
-    setStateQuestions(data);
+    // Shuffle choices for each question
+    const shuffledQuestions = data.questions.map((question) => ({
+      ...question,
+      choices: shuffle(question.choices),
+    }));
+    setStateQuestions({ questions: shuffledQuestions });
+  };
+
+  // Shuffle function to randomize array elements
+  const shuffle = (array) => {
+    for (let index = array.length - 1; index > 0; index--) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
+    }
+    return array;
   };
 
   // Fetches the list of questions when the component mounts
