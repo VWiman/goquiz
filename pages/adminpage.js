@@ -91,6 +91,20 @@ export default function adminpage() {
 		fetchQuestions();
 	};
 
+  // Clear all score
+  const handleClearScores = async () => {
+    try {
+      const response = await fetch("/api/userscore", {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      console.log(data);
+      fetchQuestions();
+    } catch (error) {
+      console.error("Error clearing user scores:", error);
+    }
+  };
+
 	return (
 		<main className="bg-blue-200 font-mono">
 			{/* // The form for creating a new question */}
@@ -214,6 +228,10 @@ export default function adminpage() {
 					</li>
 				))}
 			</ul>
+      {/* Button to clear user scores */}
+      <div className="mt-10">
+        <button onClick={handleClearScores}>Clear User Scores</button>
+      </div>
 		</main>
 	);
 }
