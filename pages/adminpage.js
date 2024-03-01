@@ -16,18 +16,10 @@ export default function adminpage() {
 	// Function to update the list of questions, including the current question being created
 	const updateQuestions = async () => {
 		const orderedChoices = [newQuestion.answer, newQuestion.choiceTwo, newQuestion.choiceThree, newQuestion.choiceFour];
-		// Shuffles the array of choices to randomize their order
-		function shuffle(array) {
-			for (let index = array.length - 1; index > 0; index--) {
-				const randomIndex = Math.floor(Math.random() * (index + 1));
-				[array[index], array[randomIndex]] = [array[randomIndex], array[index]];
-			}
-			return array;
-		}
-		const randomChoices = shuffle(orderedChoices);
+
 		const updatedNewQuestions = {
 			question: newQuestion.question,
-			choices: randomChoices,
+			choices: orderedChoices,
 			answer: newQuestion.answer,
 		};
 
@@ -66,8 +58,8 @@ export default function adminpage() {
 	// Fetches the list of questions when the component mounts
 	useEffect(() => {
 		fetchQuestions();
-  }, []);
-  
+	}, []);
+
 	// Defines an asynchronous function to handle the deletion of a question from a list.
 	const handleDelete = async (e) => {
 		// Copies the current state of questions.
