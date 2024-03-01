@@ -1,17 +1,34 @@
 import Header from "@/components/Header";
 import TopList from "@/components/TopList";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [username, setUsername] = useState("");
+
+  const [currentFact, setCurrentFact] = useState("");
+
+  const facts = [
+    "The heart of a shrimp is located in its head.",
+    "A snail can sleep for three years.",
+    "Slugs have four noses.",
+    "Elephants are the only animal that can't jump.",
+  ];
+  const fetchRandomFact = () => {
+    const randomIndex = Math.floor(Math.random() * facts.length);
+    setCurrentFact(facts[randomIndex]);
+  };
+  useEffect(() => {
+    fetchRandomFact();
+  }, []);
 
   return (
     <>
       <main className="flex justify-center items-center h-screen font-mono bg-blue-200">
         <div className="max-w-5xl mx-auto">
+          <p>{currentFact}</p>
           <h1 className=" mb-4 text-2xl font-extrabold">Welcome to GoQuiz</h1>
-          <p className="text-base">Some short text here</p>
+          <p className="text-base">Please write your username below </p>
           <div className="flex justify-center gap-10 items-center mt-3">
             <input
               type="text"

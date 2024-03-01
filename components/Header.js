@@ -11,9 +11,6 @@ const Header = () => {
         <a href="/adminpage" className="hover:text-gray-500 hover:underline">
           Admin
         </a>
-        <a href="/userpage" className="hover:text-gray-500 hover:underline">
-          Quiz
-        </a>
       </div>
     </header>
   );
