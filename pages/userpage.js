@@ -88,47 +88,71 @@ export default function userpage() {
   }, [username]); // Trigger the effect when username changes
 
   return (
-    <main className="bg-slate-50 font-mono ">
-      {/* // Displays the list of questions with their choices */}
-      <ul className="flex gap-20 py-20">
-        {stateQuestions.questions.map((item, index) => (
-          <li key={index} className="shadow-xl">
-            <div className=" flex justify-center ">
-              <h2 className="bg-gradient-to-b from-blue-500 to-blue-700 w-[100%] p-10 text-center text-3xl text-slate-50 font-bold">
-                {item.question}
-              </h2>
-            </div>
+    <main className="bg-blue-200 font-mono ">
+      <h2 className="text-center pt-10">Welcome, {username}</h2>
 
-            <ul className="p-10  text-2xl grid grid-cols-2 gap-10 bg-slate-50">
-              {item.choices.map((choice, i) => (
-                <li key={i}>
-                  <button
-                    className={`min-w-[400px] p-5 rounded-xl shadow-lg border-none ${
-                      clickedChoices[index] === i
-                        ? choice === item.answer
-                          ? "bg-green-400"
-                          : "bg-red-400"
-                        : "bg-gray-300"
-                    }`}
-                    onClick={() => handleChoiceClick(index, i, item.choices.indexOf(item.answer))}
-                    disabled={clickedChoices[index] !== undefined}
+      <div className="flex items-start ">
+        <div className=" w-2/3  ">
+          {/* // Displays the list of questions with their choices */}
+          <ul className="flex gap-10 pt-6 pb-10 justify-center ">
+            {stateQuestions.questions.map((item, index) => (
+              <li key={index} className="shadow-xl ">
+                <div className=" flex justify-center ">
+                  <h2
+                    className="bg-blue-500 w-[100%] rounded-t-xl 
+              p-2 text-left text-lg text-slate-50 font-semibold"
                   >
-                    {choice}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-      <div>
-        <p>
-          Username: {username} | Correct Answers: {correctAnswers} | Score: {calculateScore()}
-        </p>
-        {/* Disable the button if the score is already saved */}
-        <button onClick={handleSaveScore} disabled={isScoreSaved}>
-          Finish & Save My Score
-        </button>
+                    {item.question}
+                  </h2>
+                </div>
+
+                <ul className="p-6 text-sm grid grid-cols-2 gap-3 bg-slate-50 rounded-b-xl ">
+                  {item.choices.map((choice, i) => (
+                    <li key={i}>
+                      <button
+                        className={`min-w-[400px] p-2 rounded-xl shadow-lg border-none hover:text-slate-100 ${
+                          clickedChoices[index] === i
+                            ? choice === item.answer
+                              ? "bg-green-400"
+                              : "bg-red-400"
+                            : "bg-gray-300"
+                        }`}
+                        onClick={() =>
+                          handleChoiceClick(
+                            index,
+                            i,
+                            item.choices.indexOf(item.answer)
+                          )
+                        }
+                        disabled={clickedChoices[index] !== undefined}
+                      >
+                        {choice}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+          <div className="flex justify-center">
+            {/* Disable the button if the score is already saved */}
+            <button
+              onClick={handleSaveScore}
+              disabled={isScoreSaved}
+              className="flex  py-2.5 px-5 me-2 mb-6 text-lg text-gray-900 
+              bg-blue-100 border border-gray-200 hover:text-gray-500 hover:underline"
+            >
+              Finish & Save My Score
+            </button>
+          </div>
+        </div>
+        <div className=" flex justify-center w-1/3 pt-6 sticky top-0  ">
+          <div className="  bg-blue-100 w-[300px] py-6 text-lg   text-center rounded-xl border border-gray-200">
+            <p>Username: {username}</p>
+            <p>Correct Answers: {correctAnswers}</p>
+            <p>Score: {calculateScore()}</p>
+          </div>
+        </div>
       </div>
     </main>
   );
