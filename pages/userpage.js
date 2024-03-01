@@ -1,8 +1,21 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "@/context/QuizContext";
 export default function userpage() {
   // Get states from context
   const { stateQuestions, setStateQuestions } = useContext(QuizContext);
+
+  // Create State for clicked choices
+  const [clickedChoices, setClickedChoices] = useState([]);
+
+  // Function to handle choice click
+  const handleChoiceClick = (questionIndex, choiceIndex) => {
+    // Create a copy of clickedChoices state
+    const newClickedChoices = [...clickedChoices];
+    // Update the clicked status for the clicked choice
+    newClickedChoices[questionIndex] = choiceIndex;
+    // Update the state
+    setClickedChoices(newClickedChoices);
+  };
 
   // Function to fetch questions from the backend
   const fetchQuestions = async () => {
@@ -31,14 +44,19 @@ export default function userpage() {
             <ul className="p-10  text-2xl grid grid-cols-2 gap-10 bg-slate-50">
               {item.choices.map((choice, i) => (
                 <li key={i}>
-                  {/* Highlights the correct answer in green and wrong answers in
-                  red */}
                   <button
-                    className={`${
-                      choice == item.answer
-                        ? "min-w-[400px] bg-green-400 p-5 rounded-xl shadow-lg border-none"
-                        : " min-w-[400px] bg-red-400 p-5 rounded-xl shadow-lg border-none"
+                    className={`min-w-[400px] p-5 rounded-xl shadow-lg border-none ${
+                      // Check if choice is clicked and mark it accordingly
+                      clickedChoices[index] === i
+                        ? choice === item.answer
+                          ? "bg-green-400"
+                          : "bg-red-400"
+                        : "bg-gray-300"
                     }`}
+                    // Attach click event handler
+                    onClick={() => handleChoiceClick(index, i)}
+                    // Disable the button after it's clicked
+                    disabled={clickedChoices[index] !== undefined}
                   >
                     {choice}
                   </button>
@@ -48,6 +66,9 @@ export default function userpage() {
           </li>
         ))}
       </ul>
+      <div>
+        <p>Antal rätt svar: {}</p>
+      </div>
     </main>
   );
 }
