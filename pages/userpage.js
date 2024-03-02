@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "@/context/QuizContext";
 import { useRouter } from "next/router";
+import TopList from "@/components/TopList";
 
 export default function userpage() {
   const router = useRouter();
@@ -89,68 +90,78 @@ export default function userpage() {
 
   return (
     <main className="bg-blue-200 font-mono ">
-      <h2 className="text-center pt-10">Welcome, {username}</h2>
-
-      <div className="flex items-start ">
-        <div className=" w-2/3  ">
-          {/* // Displays the list of questions with their choices */}
-          <ul className="flex gap-10 pt-6 pb-10 justify-center ">
-            {stateQuestions.questions.map((item, index) => (
-              <li key={index} className="shadow-xl ">
-                <div className=" flex justify-center ">
-                  <h2
-                    className="bg-blue-500 w-[100%] rounded-t-xl 
-              p-2 text-left text-lg text-slate-50 font-semibold"
-                  >
-                    {item.question}
-                  </h2>
-                </div>
-
-                <ul className="p-6 text-sm grid grid-cols-2 gap-3 bg-slate-50 rounded-b-xl ">
-                  {item.choices.map((choice, i) => (
-                    <li key={i}>
-                      <button
-                        className={`min-w-[400px] p-2 rounded-xl shadow-lg border-none hover:text-slate-100 ${
-                          clickedChoices[index] === i
-                            ? choice === item.answer
-                              ? "bg-green-400"
-                              : "bg-red-400"
-                            : "bg-gray-300"
-                        }`}
-                        onClick={() =>
-                          handleChoiceClick(
-                            index,
-                            i,
-                            item.choices.indexOf(item.answer)
-                          )
-                        }
-                        disabled={clickedChoices[index] !== undefined}
-                      >
-                        {choice}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-          <div className="flex justify-center">
-            {/* Disable the button if the score is already saved */}
-            <button
-              onClick={handleSaveScore}
-              disabled={isScoreSaved}
-              className="flex  py-2.5 px-5 me-2 mb-6 text-lg text-gray-900 
-              bg-blue-100 border border-gray-200 hover:text-gray-500 hover:underline"
-            >
-              Finish & Save My Score
-            </button>
-          </div>
+      <div className="container mx-auto px-3 py-4">
+        <h2 className="pt-10 font-semibold text-xl mb-5">
+          Welcome, {username}
+        </h2>
+        <div className=" flex md:hidden gap-2 bg-blue-200 py-1 sticky top-0 text-xs mb-3 justify-between">
+          <p>Correct Answers: {correctAnswers}</p>
+          <p>Score: {calculateScore()}</p>
         </div>
-        <div className=" flex justify-center w-1/3 pt-6 sticky top-0  ">
-          <div className="  bg-blue-100 w-[300px] py-6 text-lg   text-center rounded-xl border border-gray-200">
-            <p>Username: {username}</p>
-            <p>Correct Answers: {correctAnswers}</p>
-            <p>Score: {calculateScore()}</p>
+        <div className="flex flex-col md:flex-row items-start gap-7">
+          <div className="basis-full md:basis-9/12 ">
+            {/* // Displays the list of questions with their choices */}
+            <ul className="flex flex-col gap-10 pb-10 justify-center ">
+              {stateQuestions.questions.map((item, index) => (
+                <li key={index} className="shadow-xl ">
+                  <div className=" flex justify-center ">
+                    <h3
+                      className="bg-blue-500 w-[100%] rounded-t-xl 
+              p-2 pl-6 text-left text-lg text-slate-50 font-semibold"
+                    >
+                      {item.question}
+                    </h3>
+                  </div>
+
+                  <ul className="p-6 text-sm grid grid-cols-2 gap-3 bg-slate-50 rounded-b-xl ">
+                    {item.choices.map((choice, i) => (
+                      <li key={i}>
+                        <button
+                          className={` min-w-full p-2 rounded-xl hover:shadow-md hover:shadow-blue-500/20 border-none hover:text-blue-600 ${
+                            clickedChoices[index] === i
+                              ? choice === item.answer
+                                ? "bg-green-400"
+                                : "bg-red-400"
+                              : "bg-gray-200"
+                          }`}
+                          onClick={() =>
+                            handleChoiceClick(
+                              index,
+                              i,
+                              item.choices.indexOf(item.answer)
+                            )
+                          }
+                          disabled={clickedChoices[index] !== undefined}
+                        >
+                          {choice}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-center">
+              {/* Disable the button if the score is already saved */}
+              <button
+                onClick={handleSaveScore}
+                disabled={isScoreSaved}
+                className="flex  py-2.5 px-5 me-2 mb-6 text-lg text-gray-900 
+              bg-blue-100 border border-gray-200 hover:text-gray-500 hover:underline"
+              >
+                Finish & Save My Score
+              </button>
+            </div>
+          </div>
+          <div className="hidden md:block md:basis-3/12 sticky top-0  ">
+            <div className=" bg-blue-100 py-6 px-4 text-base rounded-md border border-gray-200">
+              <p className="font-semibold mb-2">{username}´s Status</p>
+              <p>Correct Answers: {correctAnswers}</p>
+              <p>Score: {calculateScore()}</p>
+            </div>
+            <div className=" mt-4">
+              <TopList />
+            </div>
           </div>
         </div>
       </div>

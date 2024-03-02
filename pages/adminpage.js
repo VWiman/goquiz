@@ -269,7 +269,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
           <div
             id="myform"
             ref={myFormRef}
-            className="addform bg-blue-100  p-5 basis-full md:basis-2/3"
+            className="addform bg-blue-100  p-5 basis-full md:basis-3/4"
           >
             <h2 className="text-xl font-semibold">Add new question</h2>
             <form id="form" name="form" onSubmit={(e) => handleForm(e)}>
@@ -366,7 +366,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
               </div>
             </form>
           </div>
-          <div className="basis-full md:basis-1/3 bg-blue-100 p-5">
+          <div className="basis-full md:basis-1/4 bg-blue-100 p-5">
             <TopList />
             <div className="justify-end flex mt-2">
               <button
