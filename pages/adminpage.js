@@ -1,293 +1,433 @@
 import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "@/context/QuizContext";
+import TopList from "@/components/TopList";
+import { useRef } from "react";
 
-export default function adminpage() {
-	// set local state
+export default function adminpage({ adminUsername, adminPassword }) {
+  // set local state
+  const [isEditing, setIsEditing] = useState(false);
+  const [newQuestion, setNewQuestion] = useState({
+    question: "",
+    answer: "",
+    choiceTwo: "",
+    choiceThree: "",
+    choiceFour: "",
+  });
+  const [indexBeingEdited, setIndexBeingEdited] = useState(null);
+  const [loginCredentials, setLoginCredentials] = useState({
+    username: "",
+    password: "",
+  }); //admin login
+  const [isLoggedIn, setIsLoggedIn] = useState(false); //admin login
 
-	const [isEditing, setIsEditing] = useState(false);
-	const [newQuestion, setNewQuestion] = useState({
-		question: "",
-		answer: "",
-		choiceTwo: "",
-		choiceThree: "",
-		choiceFour: "",
-	});
-	const [indexBeingEdited, setIndexBeingEdited] = useState(null);
+  // Get states from context
+  const { stateQuestions, setStateQuestions, isSending, setIsSending } =
+    useContext(QuizContext);
 
-	// Get states from context
-	const { stateQuestions, setStateQuestions, isSending, setIsSending } = useContext(QuizContext);
+  // Function to fetch questions from the backend
+  const fetchQuestions = async () => {
+    const response = await fetch("/api/store");
+    const data = await response.json();
+    console.log(data);
+    setStateQuestions(data);
+  };
 
-	// Function to fetch questions from the backend
-	const fetchQuestions = async () => {
-		const response = await fetch("/api/store");
-		const data = await response.json();
-		console.log(data);
-		setStateQuestions(data);
-	};
+  // Function to update the list of questions, including the current question being created
+  const updateQuestions = async () => {
+    const orderedChoices = [
+      newQuestion.answer,
+      newQuestion.choiceTwo,
+      newQuestion.choiceThree,
+      newQuestion.choiceFour,
+    ];
 
-	// Function to update the list of questions, including the current question being created
-	const updateQuestions = async () => {
-		const orderedChoices = [newQuestion.answer, newQuestion.choiceTwo, newQuestion.choiceThree, newQuestion.choiceFour];
+    const updatedQuestion = {
+      question: newQuestion.question,
+      choices: orderedChoices,
+      answer: newQuestion.answer,
+    };
 
-		const updatedQuestion = {
-			question: newQuestion.question,
-			choices: orderedChoices,
-			answer: newQuestion.answer,
-		};
+    let updatedQuestionsList = [...stateQuestions.questions];
 
-		let updatedQuestionsList = [...stateQuestions.questions];
+    if (indexBeingEdited !== null) {
+      // Replace the question at the specific index
+      updatedQuestionsList[indexBeingEdited] = updatedQuestion;
+    } else {
+      // If not editing, add the new question to the list
+      updatedQuestionsList.push(updatedQuestion);
+    }
 
-		if (indexBeingEdited !== null) {
-			// Replace the question at the specific index
-			updatedQuestionsList[indexBeingEdited] = updatedQuestion;
-		} else {
-			// If not editing, add the new question to the list
-			updatedQuestionsList.push(updatedQuestion);
-		}
+    const response = await fetch("/api/store", {
+      method: "POST",
+      body: JSON.stringify({ questions: updatedQuestionsList }),
+    });
+    const data = await response.json();
+    console.log(data);
+    setIndexBeingEdited(null);
+    setIsEditing(false);
+    setIsSending(false);
 
-		const response = await fetch("/api/store", {
-			method: "POST",
-			body: JSON.stringify({ questions: updatedQuestionsList }),
-		});
-		const data = await response.json();
-		console.log(data);
-		setIndexBeingEdited(null);
-		setIsEditing(false);
-		setIsSending(false);
+    fetchQuestions();
+  };
 
-		fetchQuestions();
-	};
+  // Handles form submission, validates the question, and triggers question update
+  function handleForm(e) {
+    if (newQuestion.question != "") {
+      setIsSending(true);
+      e.preventDefault();
+      console.log(e.target.value);
+      updateQuestions();
+      // Resets the form fields after submission
+      const resetNewQuestion = { ...newQuestion };
+      for (const key in resetNewQuestion) {
+        resetNewQuestion[key] = "";
+      }
+      setNewQuestion(resetNewQuestion);
+    } else alert("You need to fill in the question form.");
+  }
 
-	// Handles form submission, validates the question, and triggers question update
-	function handleForm(e) {
-		if (newQuestion.question != "") {
-			setIsSending(true);
-			e.preventDefault();
-			console.log(e.target.value);
-			updateQuestions();
-			// Resets the form fields after submission
-			const resetNewQuestion = { ...newQuestion };
-			for (const key in resetNewQuestion) {
-				resetNewQuestion[key] = "";
-			}
-			setNewQuestion(resetNewQuestion);
-		} else alert("You need to fill in the question form.");
-	}
+  // Fetches the list of questions when the component mounts
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
-	// Fetches the list of questions when the component mounts
-	useEffect(() => {
-		fetchQuestions();
-	}, []);
+  // Handles login form submission
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const { username, password } = loginCredentials;
+    if (username === adminUsername && password === adminPassword) {
+      localStorage.setItem("isLoggedIn", "true");
+      setIsLoggedIn(true);
+    } else {
+      alert("Invalid username or password");
+    }
+  };
+  // Check session on page load
+  useEffect(() => {
+    const session = localStorage.getItem("isLoggedIn");
+    if (session === "true") {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
-	// Defines an asynchronous function to handle the deletion of a question from a list.
-	const handleDelete = async (e) => {
-		// Copies the current state of questions.
-		const currentQuestions = [...stateQuestions.questions];
+  // Handle logout
+  const handleLogout = () => {
+    // Clear session from localStorage
+    localStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+  };
 
-		// Retrieves the identifier (e.g., index or unique ID) of the question to delete
-		// from the event's target value. (index/ID is stored in button value)
-		const questionToDelete = isEditing ? e : e.target.value;
+  // Defines an asynchronous function to handle the deletion of a question from a list.
+  const handleDelete = async (e) => {
+    // Checks if the user is logged in before allowing deletion
+    if (!isLoggedIn) {
+      alert("You need to log in to perform this action");
+      return;
+    }
+    // Copies the current state of questions.
+    const currentQuestions = [...stateQuestions.questions];
 
-		// Filters out the question to delete by comparing each question's index or ID
-		// against the `questionToDelete`.
-		const questionsAfterDelete = currentQuestions.filter((q) => currentQuestions.indexOf(q) != questionToDelete);
+    // Retrieves the identifier (e.g., index or unique ID) of the question to delete
+    // from the event's target value. (index/ID is stored in button value)
+    const questionToDelete = isEditing ? e : e.target.value;
 
-		// Updates the component's state with the new array of questions, without the deleted question.
-		setStateQuestions({ questions: questionsAfterDelete });
+    // Filters out the question to delete by comparing each question's index or ID
+    // against the `questionToDelete`.
+    const questionsAfterDelete = currentQuestions.filter(
+      (q) => currentQuestions.indexOf(q) != questionToDelete
+    );
 
-		// Sends a POST request to a server endpoint with updated questions.
-		const response = await fetch("/api/store", {
-			method: "POST",
-			body: JSON.stringify({ questions: questionsAfterDelete }),
-		});
+    // Updates the component's state with the new array of questions, without the deleted question.
+    setStateQuestions({ questions: questionsAfterDelete });
 
-		// Parses the JSON response from the server.
-		const data = await response.json();
+    // Sends a POST request to a server endpoint with updated questions.
+    const response = await fetch("/api/store", {
+      method: "POST",
+      body: JSON.stringify({ questions: questionsAfterDelete }),
+    });
 
-		console.log(data);
+    // Parses the JSON response from the server.
+    const data = await response.json();
 
-		// Calls a function to re-fetch the list of questions.
-		fetchQuestions();
-	};
+    console.log(data);
 
-	const handleEdit = (e) => {
-		setIsEditing(true);
+    // Calls a function to re-fetch the list of questions.
+    fetchQuestions();
+  };
 
-		const currentQuestions = [...stateQuestions.questions];
+  const myFormRef = useRef(null);
 
-		const idToEdit = e.target.value;
+  const handleEdit = (e) => {
+    setIsEditing(true);
 
-		setIndexBeingEdited(idToEdit);
+    const currentQuestions = [...stateQuestions.questions];
 
-		const questionToEdit = currentQuestions.filter((q) => currentQuestions.indexOf(q) == idToEdit);
+    const idToEdit = e.target.value;
 
-		console.log(questionToEdit);
+    setIndexBeingEdited(idToEdit);
 
-		const data = { ...questionToEdit };
+    const questionToEdit = currentQuestions.filter(
+      (q) => currentQuestions.indexOf(q) == idToEdit
+    );
 
-		const question = data[0].question;
-		const answer = data[0].answer;
-		const choices = data[0].choices;
-		const choiceTwo = choices[1];
-		const choiceThree = choices[2];
-		const choiceFour = choices[3];
+    console.log(questionToEdit);
 
-		console.log(question, answer, choices);
+    const data = { ...questionToEdit };
 
-		setNewQuestion({
-			...newQuestion,
-			question: question,
-			answer: answer,
-			choiceTwo: choiceTwo,
-			choiceThree: choiceThree,
-			choiceFour: choiceFour,
-		});
-	};
+    const question = data[0].question;
+    const answer = data[0].answer;
+    const choices = data[0].choices;
+    const choiceTwo = choices[1];
+    const choiceThree = choices[2];
+    const choiceFour = choices[3];
 
-	// Clear all score
-	const handleClearScores = async () => {
-		try {
-			const response = await fetch("/api/userscore", {
-				method: "DELETE",
-			});
-			const data = await response.json();
-			console.log(data);
-			fetchQuestions();
-		} catch (error) {
-			console.error("Error clearing user scores:", error);
-		}
-	};
+    console.log(question, answer, choices);
 
-	return (
-		<main className="bg-blue-200 font-mono">
-			{/* // The form for creating a new question */}
-			<form id="form" name="form" onSubmit={(e) => handleForm(e)}>
-				<div className="flex justify-between w-full px-20  ">
-					<div className="flex items-center text-2xl">
-						<label htmlFor="question" className="bg-blue-100 p-3 text-2xl mb-6">
-							Question:
-							<input
-								id="question"
-								name="question"
-								value={newQuestion.question}
-								onChange={(e) =>
-									setNewQuestion({
-										...newQuestion,
-										question: e.target.value,
-									})
-								}></input>
-						</label>
-					</div>
+    setNewQuestion({
+      ...newQuestion,
+      question: question,
+      answer: answer,
+      choiceTwo: choiceTwo,
+      choiceThree: choiceThree,
+      choiceFour: choiceFour,
+    });
+    myFormRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
-					<div className="mt-10">
-						<label htmlFor="answer" className="bg-blue-100 p-3 text-2xl mb-6 justify-between">
-							Choice one - Correct answer:
-							<input
-								id="answer"
-								name="answer"
-								value={newQuestion.answer}
-								onChange={(e) =>
-									setNewQuestion({
-										...newQuestion,
-										answer: e.target.value,
-									})
-								}></input>
-						</label>
+  // Clear all score
+  const handleClearScores = async () => {
+    try {
+      const response = await fetch("/api/userscore", {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      console.log(data);
+      fetchQuestions();
+    } catch (error) {
+      console.error("Error clearing user scores:", error);
+    }
+  };
 
-						<label htmlFor="choiceTwo" className="bg-blue-100 p-3 text-2xl mb-6 flex justify-between ">
-							Choice two - Wrong answer:
-							<input
-								id="choiceTwo"
-								name="choiceTwo"
-								value={newQuestion.choiceTwo}
-								onChange={(e) =>
-									setNewQuestion({
-										...newQuestion,
-										choiceTwo: e.target.value,
-									})
-								}></input>
-						</label>
+  // Renders login form if user is not logged in
+  if (!isLoggedIn) {
+    return (
+      <div>
+        <h1>Admin Login</h1>
+        <form onSubmit={handleLogin}>
+          <label>
+            Username:
+            <input
+              type="text"
+              value={loginCredentials.username}
+              onChange={(e) =>
+                setLoginCredentials({
+                  ...loginCredentials,
+                  username: e.target.value,
+                })
+              }
+            />
+          </label>
+          <label>
+            Password:
+            <input
+              type="password"
+              value={loginCredentials.password}
+              onChange={(e) =>
+                setLoginCredentials({
+                  ...loginCredentials,
+                  password: e.target.value,
+                })
+              }
+            />
+          </label>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    );
+  }
 
-						<label htmlFor="choiceThree" className="bg-blue-100 p-3 text-2xl mb-6 flex justify-between">
-							Choice three - Wrong answer:
-							<input
-								id="choiceThree"
-								name="choiceThree"
-								value={newQuestion.choiceThree}
-								onChange={(e) =>
-									setNewQuestion({
-										...newQuestion,
-										choiceThree: e.target.value,
-									})
-								}></input>
-						</label>
+  // Renders admin page content if user is logged in
+  return (
+    <main className="bg-blue-200 font-mono">
+      <div className="container mx-auto px-3 py-4">
+        <div className="flex justify-between py-3">
+          <div>
+            Welcome back{" "}
+            <span className=" font-extrabold">{adminUsername}</span>
+          </div>
+          <div className="flex gap-2">
+            {/* <div>
+              <button onClick={handleClearScores}>Clear User Scores</button>
+            </div> */}
+            <div>
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+        {/* // The form for creating a new question */}
+        <div className="flex flex-col md:flex-row gap-5 my-8">
+          <div
+            id="myform"
+            ref={myFormRef}
+            className="addform bg-blue-100  p-5 basis-full md:basis-2/3"
+          >
+            <h2 className="text-xl font-semibold">Add new question</h2>
+            <form id="form" name="form" onSubmit={(e) => handleForm(e)}>
+              <div className="w-full">
+                <div className=" mb-4">
+                  <label htmlFor="question">
+                    Question:
+                    <input
+                      id="question"
+                      name="question"
+                      value={newQuestion.question}
+                      onChange={(e) =>
+                        setNewQuestion({
+                          ...newQuestion,
+                          question: e.target.value,
+                        })
+                      }
+                    ></input>
+                  </label>
+                </div>
 
-						<label htmlFor="choiceFour" className="bg-blue-100 p-3 text-2xl flex justify-between mb-6">
-							Choice four - Wrong answer:
-							<input
-								id="choiceFour"
-								name="choiceFour"
-								value={newQuestion.choiceFour}
-								onChange={(e) =>
-									setNewQuestion({
-										...newQuestion,
-										choiceFour: e.target.value,
-									})
-								}></input>
-						</label>
+                <div className="mt-5">
+                  <label htmlFor="answer">
+                    Choice one - Correct answer:
+                    <input
+                      id="answer"
+                      name="answer"
+                      value={newQuestion.answer}
+                      onChange={(e) =>
+                        setNewQuestion({
+                          ...newQuestion,
+                          answer: e.target.value,
+                        })
+                      }
+                    ></input>
+                  </label>
 
-						<div className="w-[600px] justify-center flex">
-							<button
-								disabled={isSending}
-								type="submit"
-								id="submitButton"
-								className=" py-2.5 px-5 ml-10 mb-2 text-xl  text-gray-900 
-           bg-blue-100 border border-gray-200  hover:text-gray-500 hover:underline
-           ">
-								{isEditing ? "Update question" : "Add question"}
-							</button>
-						</div>
-					</div>
-				</div>
-			</form>
+                  <label htmlFor="choiceTwo">
+                    Choice two - Wrong answer:
+                    <input
+                      id="choiceTwo"
+                      name="choiceTwo"
+                      value={newQuestion.choiceTwo}
+                      onChange={(e) =>
+                        setNewQuestion({
+                          ...newQuestion,
+                          choiceTwo: e.target.value,
+                        })
+                      }
+                    ></input>
+                  </label>
 
-			{/* // Displays the list of questions with their choices */}
-			<ul className="mt-20">
-				{stateQuestions.questions.map((item, index) => (
-					<li id={index} key={index}>
-						<div className=" flex justify-center">
-							<h2 className="bg-blue-100 w-fit p-3 text-2xl mb-6  ">{item.question}</h2>
-						</div>
+                  <label htmlFor="choiceThree">
+                    Choice three - Wrong answer:
+                    <input
+                      id="choiceThree"
+                      name="choiceThree"
+                      value={newQuestion.choiceThree}
+                      onChange={(e) =>
+                        setNewQuestion({
+                          ...newQuestion,
+                          choiceThree: e.target.value,
+                        })
+                      }
+                    ></input>
+                  </label>
 
-						<ul className="p-6  text-2xl mb-6 grid grid-cols-2 ">
-							{item.choices.map((choice, i) => (
-								<li key={i}>
-									{/* Highlights the correct answer in blue and wrong answers in
+                  <label htmlFor="choiceFour">
+                    Choice four - Wrong answer:
+                    <input
+                      id="choiceFour"
+                      name="choiceFour"
+                      value={newQuestion.choiceFour}
+                      onChange={(e) =>
+                        setNewQuestion({
+                          ...newQuestion,
+                          choiceFour: e.target.value,
+                        })
+                      }
+                    ></input>
+                  </label>
+
+                  <div className="justify-end flex mt-2">
+                    <button
+                      disabled={isSending}
+                      type="submit"
+                      id="submitButton"
+                      className=" py-2.5 px-5 mt-5 text-lg text-gray-900 bg-blue-100 border border-gray-600  hover:text-gray-500 hover:underline"
+                    >
+                      {isEditing ? "Update question" : "Add question"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div className="basis-full md:basis-1/3 bg-blue-100 p-5">
+            <TopList />
+            <div className="justify-end flex mt-2">
+              <button
+                className="py-2.5 px-5 mt-5 text-lg text-gray-900 bg-blue-100 border border-gray-600  hover:text-gray-500 hover:underline"
+                onClick={handleClearScores}
+              >
+                Clear User Scores
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* // Displays the list of questions with their choices */}
+        <div className="qlist mt-4">
+          <h2 className="text-xl font-semibold">Published Questions List</h2>
+          <ul className="mt-5">
+            {stateQuestions.questions.map((item, index) => (
+              <li id={index} key={index}>
+                <h3 className="text-2xl mb-2 pl-6 pt-6">{item.question}</h3>
+
+                <ul className=" px-6 pt-2 flex flex-col">
+                  {item.choices.map((choice, i) => (
+                    <li key={i} className=" w-full">
+                      {/* Highlights the correct answer in blue and wrong answers in
                   red */}
-									<button
-										className={`${
-											choice == item.answer
-												? "min-w-[500px] bg-blue-500/60 p-4 rounded-xl shadow-2xl m-4 border-none"
-												: " min-w-[500px] bg-red-500/90 border-none p-4 rounded-xl shadow-2xl m-4 "
-										}`}>
-										{choice}
-									</button>
-								</li>
-							))}
-						</ul>
-						<button value={index} onClick={(e) => handleDelete(e)}>
-							DELETE
-						</button>
-						<button value={index} onClick={(e) => handleEdit(e)}>
-							EDIT
-						</button>
-					</li>
-				))}
-			</ul>
-			{/* Button to clear user scores */}
-			<div className="mt-10">
-				<button onClick={handleClearScores}>Clear User Scores</button>
-			</div>
-		</main>
-	);
+                      <div
+                        className={`${
+                          choice == item.answer
+                            ? " border-l-4 border-green-600 bg-blue-50"
+                            : " border-l-4 border-gray-600 bg-blue-50"
+                        } pl-2`}
+                      >
+                        {choice}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-end gap-3 px-6 mt-2 pb-3">
+                  <button value={index} onClick={(e) => handleEdit(e)}>
+                    EDIT
+                  </button>
+                  <button value={index} onClick={(e) => handleDelete(e)}>
+                    DELETE
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export async function getStaticProps() {
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  return {
+    props: {
+      adminUsername,
+      adminPassword,
+    },
+  };
 }
