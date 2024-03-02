@@ -4,13 +4,7 @@ export const QuizContext = createContext();
 
 export const QuizProvider = ({ children }) => {
   const [stateQuestions, setStateQuestions] = useState({ questions: [] });
-  const [newQuestion, setNewQuestion] = useState({
-    question: "",
-    answer: "",
-    choiceTwo: "",
-    choiceThree: "",
-    choiceFour: "",
-  });
+
   const [isSending, setIsSending] = useState(false);
 
   const fetchQuestions = async () => {
@@ -28,8 +22,6 @@ export const QuizProvider = ({ children }) => {
       value={{
         stateQuestions,
         setStateQuestions,
-        newQuestion,
-        setNewQuestion,
         isSending,
         setIsSending,
         fetchQuestions, // new fetchQuestions function
