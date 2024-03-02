@@ -18,6 +18,17 @@ form {
   @apply flex flex-col gap-2 p-2 justify-center items-center;
 }
 
-ul {
+/* ul {
   @apply flex flex-col justify-center items-center gap-1;
+} */
+
+.addform label {
+  @apply text-base mb-1 flex align-middle justify-between flex-col md:flex-row;
+}
+.addform input {
+  @apply w-2/3;
+}
+
+.qlist ul li {
+  @apply bg-blue-100 rounded-sm mb-2;
 }
