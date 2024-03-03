@@ -1,4 +1,5 @@
 // Only comments and no code by ChatGPT
+// Followed a medium tutorial to understand how to do this, it was for bikes. Took some adapting.
 
 import fsPromises from "fs/promises";
 import path from "path";

@@ -104,7 +104,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
 			alert("Invalid username or password");
 		}
 	};
-	
+
 	// Check session on page load
 	useEffect(() => {
 		const session = localStorage.getItem("isLoggedIn");
@@ -216,7 +216,10 @@ export default function adminpage({ adminUsername, adminPassword }) {
 					<label>
 						Username:
 						<input
+							id="adminName"
+							name="adminName"
 							type="text"
+							autoComplete="username"
 							value={loginCredentials.username}
 							onChange={(e) =>
 								setLoginCredentials({
@@ -229,7 +232,10 @@ export default function adminpage({ adminUsername, adminPassword }) {
 					<label>
 						Password:
 						<input
+							id="adminPassword"
+							name="adminPassword"
 							type="password"
+							autoComplete="current-password"
 							value={loginCredentials.password}
 							onChange={(e) =>
 								setLoginCredentials({

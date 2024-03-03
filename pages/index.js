@@ -31,6 +31,8 @@ export default function Home() {
           <p className="text-base">Please write your username below </p>
           <div className="flex justify-center gap-10 items-center mt-3">
             <input
+              id="userNameInput"
+              name="userNameInput"
               type="text"
               placeholder="Enter your username"
               value={username}
