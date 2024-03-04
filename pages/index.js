@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex justify-center h-screen font-mono bg-blue-200 pt-14 px-3 md:px-0">
+      <main className="flex justify-center min-h-svh font-mono bg-blue-200 pt-14 pb-8 px-3 md:px-0">
         <div className="max-w-xl mx-auto">
           <h1 className=" mb-8 text-3xl font-extrabold">Welcome to GoQuiz</h1>
           <div className="bg-zinc-900 rounded-md -mb-4 py-1 px-3 text-white text-xs inline-block -ml-3">Do you know the answer?</div>
