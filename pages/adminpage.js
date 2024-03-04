@@ -202,6 +202,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
 			const data = await response.json();
 			console.log(data);
 			fetchQuestions();
+			window.location.reload(); // Refresh the page after delete user scores
 		} catch (error) {
 			console.error("Error clearing user scores:", error);
 		}
