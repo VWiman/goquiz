@@ -212,7 +212,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
 	if (!isLoggedIn) {
 		return (
 			<div>
-				<h1>Admin Login</h1>
+				<h1 className=" pl-6">Admin Login</h1>
 				<form onSubmit={handleLogin}>
 					<label>
 						Username:
