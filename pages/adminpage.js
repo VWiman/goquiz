@@ -211,7 +211,7 @@ export default function adminpage({ adminUsername, adminPassword }) {
 	// Renders login form if user is not logged in
 	if (!isLoggedIn) {
 		return (
-			<div>
+			<div className="h-screen">
 				<h1 className=" pl-6">Admin Login</h1>
 				<form onSubmit={handleLogin}>
 					<label>
